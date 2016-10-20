@@ -1,7 +1,7 @@
 'use strict'
 const base = require('../..')
 const test = require('brisky-performance')
-var amount = 1e3
+var amount = 1e4
 
 function setKeys () {
   const a = base({ a: 100, b: 100 })
@@ -40,7 +40,7 @@ function createConstructorsAndResolve () {
     // creating the actual constructor is just rly slow
     // new x()
     // new y(i)
-    let b = new a.Constructor({ b: true }) //eslint-disable-line
+    let b = new a.Constructor() //eslint-disable-line
   }
 }
 
