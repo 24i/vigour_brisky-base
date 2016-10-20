@@ -1,7 +1,7 @@
 'use strict'
 const base = require('../..')
 const test = require('brisky-performance')
-var amount = 1e6
+var amount = 1e4
 
 function setKeys () {
   const a = base({ a: 100, b: 100 })
@@ -41,6 +41,7 @@ function createConstructorsAndResolve () {
     // new x()
     // new y(i)
     let b = new a.Constructor() //eslint-disable-line
+    let c = new b.Constructor()
   }
 }
 
@@ -105,6 +106,8 @@ const ultra = {
       }
     }
   },
+  // so all methods that need to be able to get extended are
+  // 1: remove, render, set -- nothing else is extendable
   set (target, val) {
     for (let key in val) {
       // property check ofc
@@ -142,7 +145,7 @@ var a = ultra.new(ultra, {
 var b = ultra.new(a, { y: true, _i: false })
 var c = ultra.new(b, { y: 'bla' })
 
-console.log(c)
+// console.log(c)
 // 4x faster
 
 
@@ -220,24 +223,31 @@ var turbo = [
 
 var createTurbo = turbo[0].new
 
-// test(ultramake, baseMake, 1)
 // test(ultraGet, baseGet, 1)
 
 function createItTurbo() {
   var x = createTurbo(turbo, { x: true }, true)
   for (let i = 0; i < amount; i++) {
-    let b = createTurbo(x)
+    let a = createTurbo(x)
+    let b = createTurbo(a)
     let c = createTurbo(b)
   }
 }
 
+var truboSmoots = createTurbo(turbo, { x: true }, true)
+
+function createTurboSingle() {
+  for (let i = 0; i < amount; i++) {
+    let b = createTurbo(truboSmoots, { x: true })
+  }
+}
 
 var xx = createTurbo(turbo, { x: { val: true }, blurfi: true }, true)
 var y = createTurbo(xx)
 var z = createTurbo(y)
 
 var getTurbo = turbo[0].get
-    console.warn(z)
+    // console.warn(z)
 
 function getTurbox() {
   for (let i = 0; i < amount; i++) {
@@ -251,6 +261,9 @@ test(createItTurbo, ultramakeContext, 1)
 
 test(getTurbox, ultraGet, 1)
 
+test(createItTurbo, baseMake, 1)
+
+test(createItTurbo, createConstructorsAndResolve, 1)
 
 // setTimeout(() => {
 //   console.log(Object.keys(list))
