@@ -27,23 +27,6 @@ test('set - type', t => {
   t.end()
 })
 
-test('set - reserved key error', t => {
-  t.plan(1)
-  const a = base({
-    define: {
-      field: { val: 'haha reserved!' }
-    }
-  })
-  try {
-    a.set({
-      field: 'haha'
-    })
-  } catch (e) {
-    t.equal(e.message, 'cannot set property "field", on "base" ')
-  }
-  t.end()
-})
-
 test('set - param and isNew', t => {
   var results = []
   var newArray = []
