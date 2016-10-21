@@ -59,6 +59,11 @@ const property = (target, key, val, stamp) => {
 
   if (key === 'on') {
     // so this one has a custom set -- thats fine thats just properties
+    // simple if index then -->
+
+    // keys what to do with it? -- important for state speed
+
+    // maybe make it faster for 1 as well
     const result = [{}]
     for (let i in val[key]) {
       result.push(val[key][i])
@@ -68,15 +73,15 @@ const property = (target, key, val, stamp) => {
     // return create(on, val[key], stamp, target)
   } else {
     const child = target.child || (target.child = get(target, 'child', true))
-    // if (child === true) {
-    //   if (!target[0]._keys) {
-    //     target[0]._keys = []
-    //   }
-    //   target[0]._keys.push(val[key])
-    //   return target[0]._keys.length - 1
-    // } else {
+    if (child === true) {
+      if (!target[0]._keys) {
+        target[0]._keys = []
+      }
+      target[0]._keys.push(val[key])
+      return target[0]._keys.length - 1
+    } else {
       return create(child, val[key], stamp, target)
-    // }
+    }
   }
 }
 
@@ -91,7 +96,6 @@ const isReference = (val) => {
 }
 
 // similair to set key internal sort of same handeling
-
 
 const set = (target, val, stamp, isNew) => {
   var changed
@@ -130,13 +134,6 @@ const set = (target, val, stamp, isNew) => {
       const t = target[0]
       if (typeof t === 'object') {
         t.val = val
-        if (stamp && t.on) {
-          // t.on[0]._emitter.emit('data', stamp)
-          // const listeners = t.on[0]._keys
-          // for (let j = 0, len = listeners.length; j < len; j++) {
-          //   listeners[j](val, target, stamp)
-          // }
-        }
       } else {
         if (target[0] !== val) {
           target[0] = val
@@ -173,6 +170,7 @@ const get = (target, key, context) => {
 
 const create = (target, val, stamp, parent, noInstances) => {
   // find a way to not allways need stamps for , for exmaple listeners
+  // properties in val or in the array?
   const t = [ val, target, parent, stamp ]
   if (val !== void 0) { set(t, val, stamp, true) }
   if (noInstances) { t[4] = true }
@@ -198,11 +196,11 @@ turbo.child = base
 // test(ultraGet, baseGet, 1)
 
 function createItTurboTripple() {
-  var x = create(base, { x: true }, void 0, void 0, true)
+  var x = create(base, { x: true }, void 0, void 0, void 0, true)
   for (let i = 0; i < amount; i++) {
     let a = create(x)
-    let b = create(a)
-    let c = create(b)
+    let bx = create(a)
+    let cxxx = create(bx)
   }
 }
 
@@ -248,7 +246,7 @@ function getBase () {
   }
 }
 
-var xx = create(base, { x: true, blurfi: true }, void 0, void 0, true)
+var xx = create(base, { x: true, blurfi: true }, void 0, void 0, void 0, true)
 var y = create(xx)
 var z = create(y)
 function getTurbo () {
@@ -307,17 +305,18 @@ function emitObservable () {
 }
 
 // 10k 700
-// test(createTurboSingleInheritance, baseMakeInheritance, 1)
+test(createTurboSingleInheritance, baseMakeInheritance, 1, 1)
 
-// test(createTurboSingle, baseMake, 1)
+// test(createTurboSingle, baseMake, 1, 10)
 
-// test(createItTurboTripple, baseMake, 2)
+// test(createItTurboTripple, baseMake, 2, 10)
 
-// test(getTurbo, getBase, 1)
+// test(getTurbo, getBase, 1, 10)
 
 //  ⨯ 64.9 ms is smaller then 48.3 ms
+// test(turboListener, observable, 1, 10)
 
-test(emitTurboListener, emitObservable, 1, 1)
+// test(emitTurboListener, emitObservable, 1, 1)
 
 setTimeout(() => {
   console.log(cnt, obs)
